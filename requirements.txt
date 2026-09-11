@@ -1,2 +1,6 @@
 pypdf
 python-dotenv
+fonttools
+azure-search-documents
+azure-identity
+openai
