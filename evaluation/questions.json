@@ -1,0 +1,27 @@
+[
+  {
+    "id": "algorithms-dynamic-programming",
+    "question": "What problem characteristics make dynamic programming appropriate?",
+    "expected_source_document": "Algorithms/Introduction to Algorithms-Cormen 3rd edition.pdf"
+  },
+  {
+    "id": "networking-layers",
+    "question": "What is the difference between the transport layer and network layer?",
+    "expected_source_document": "Computer Networks/Computer_Networking_A_Top-Down_Approach-6th Edition.pdf"
+  },
+  {
+    "id": "clean-architecture-dependency-rule",
+    "question": "What is the dependency rule in Clean Architecture?",
+    "expected_source_document": "Coding/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf"
+  },
+  {
+    "id": "effective-java-static-factories",
+    "question": "When are static factory methods preferable to constructors?",
+    "expected_source_document": "Java/Effective Java-Joshua Bloch.pdf"
+  },
+  {
+    "id": "operating-systems-process-thread",
+    "question": "What is the difference between a process and a thread?",
+    "expected_source_document": "Operating System/operating-system-concepts-9th-edition.pdf"
+  }
+]
