@@ -1,0 +1,8 @@
+{
+  "description": "Initial documents used to validate indexing, retrieval, and RAG answers.",
+  "documents": [
+    "Algorithms/Introduction to Algorithms-Cormen 3rd edition.pdf",
+    "Computer Networks/Computer_Networking_A_Top-Down_Approach-6th Edition.pdf",
+    "Coding/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf"
+  ]
+}
