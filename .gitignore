@@ -15,6 +15,7 @@ local.settings.json
 
 # Data and generated files
 data/
+evaluation/results.json
 output/
 tmp/
 *.sqlite
