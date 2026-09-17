@@ -4,7 +4,7 @@ import argparse
 import os
 from typing import Literal
 
-from azure.core.credentials import AzureKeyCredential
+from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 from azure.search.documents import SearchClient
 from azure.search.documents.models import VectorizedQuery
 from dotenv import load_dotenv
@@ -17,6 +17,7 @@ enough information, say that you do not have enough information in the indexed
 sources. Cite claims using the bracketed source labels exactly as supplied."""
 
 RetrievalMode = Literal["vector", "hybrid"]
+AZURE_OPENAI_SCOPE = "https://cognitiveservices.azure.com/.default"
 
 
 def format_context(results: list[dict]) -> str:
@@ -38,8 +39,9 @@ def ask_question(
     sources = retrieve_sources(question, top, retrieval_mode)
     context = format_context(sources)
     load_dotenv()
+    credential = DefaultAzureCredential()
     openai_client = OpenAI(
-        api_key=os.environ["AZURE_OPENAI_API_KEY"],
+        api_key=get_bearer_token_provider(credential, AZURE_OPENAI_SCOPE),
         base_url=os.environ["AZURE_OPENAI_ENDPOINT"].rstrip("/") + "/",
     )
     completion = openai_client.chat.completions.create(
@@ -67,14 +69,15 @@ def retrieve_sources(
         raise ValueError("retrieval_mode must be 'vector' or 'hybrid'.")
 
     load_dotenv()
+    credential = DefaultAzureCredential()
     openai_client = OpenAI(
-        api_key=os.environ["AZURE_OPENAI_API_KEY"],
+        api_key=get_bearer_token_provider(credential, AZURE_OPENAI_SCOPE),
         base_url=os.environ["AZURE_OPENAI_ENDPOINT"].rstrip("/") + "/",
     )
     search_client = SearchClient(
         endpoint=os.environ["AZURE_SEARCH_ENDPOINT"],
         index_name=os.environ["AZURE_SEARCH_INDEX_NAME"],
-        credential=AzureKeyCredential(os.environ["AZURE_SEARCH_API_KEY"]),
+        credential=credential,
     )
 
     embedding_response = openai_client.embeddings.create(

@@ -9,7 +9,7 @@ from itertools import islice
 from pathlib import Path
 from time import monotonic
 
-from azure.core.credentials import AzureKeyCredential
+from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 from azure.search.documents import SearchClient
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -19,6 +19,7 @@ INPUT_FILE = Path("data/chunks.jsonl")
 EMBEDDING_BATCH_SIZE = 64
 UPLOAD_BATCH_SIZE = 500
 PROGRESS_INTERVAL_SECONDS = 5 * 60
+AZURE_OPENAI_SCOPE = "https://cognitiveservices.azure.com/.default"
 
 
 def read_chunks(input_file: Path) -> Iterator[dict]:
@@ -85,14 +86,15 @@ def main() -> None:
 
     total_chunks = count_chunks(args.input_file, args.limit)
     load_dotenv()
+    credential = DefaultAzureCredential()
     openai_client = OpenAI(
-        api_key=os.environ["AZURE_OPENAI_API_KEY"],
+        api_key=get_bearer_token_provider(credential, AZURE_OPENAI_SCOPE),
         base_url=os.environ["AZURE_OPENAI_ENDPOINT"].rstrip("/") + "/",
     )
     search_client = SearchClient(
         endpoint=os.environ["AZURE_SEARCH_ENDPOINT"],
         index_name=os.environ["AZURE_SEARCH_INDEX_NAME"],
-        credential=AzureKeyCredential(os.environ["AZURE_SEARCH_API_KEY"]),
+        credential=credential,
     )
     deployment = os.environ["AZURE_OPENAI_EMBEDDING_DEPLOYMENT"]
 

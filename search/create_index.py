@@ -2,7 +2,7 @@
 
 import os
 
-from azure.core.credentials import AzureKeyCredential
+from azure.identity import DefaultAzureCredential
 from azure.search.documents.indexes import SearchIndexClient
 from azure.search.documents.indexes.models import (
     HnswAlgorithmConfiguration,
@@ -95,11 +95,10 @@ def main() -> None:
     load_dotenv()
 
     endpoint = os.environ["AZURE_SEARCH_ENDPOINT"]
-    api_key = os.environ["AZURE_SEARCH_API_KEY"]
 
     client = SearchIndexClient(
         endpoint=endpoint,
-        credential=AzureKeyCredential(api_key),
+        credential=DefaultAzureCredential(),
     )
 
     index = client.create_or_update_index(build_index())
