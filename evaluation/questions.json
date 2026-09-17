@@ -2,26 +2,50 @@
   {
     "id": "algorithms-dynamic-programming",
     "question": "What problem characteristics make dynamic programming appropriate?",
-    "expected_source_document": "Algorithms/Introduction to Algorithms-Cormen 3rd edition.pdf"
+    "expected_source_document": "Algorithms/Introduction to Algorithms-Cormen 3rd edition.pdf",
+    "expected_concepts": [
+      "overlapping subproblems",
+      "optimal substructure"
+    ]
   },
   {
     "id": "networking-layers",
     "question": "What is the difference between the transport layer and network layer?",
-    "expected_source_document": "Computer Networks/Computer_Networking_A_Top-Down_Approach-6th Edition.pdf"
+    "expected_source_document": "Computer Networks/Computer_Networking_A_Top-Down_Approach-6th Edition.pdf",
+    "expected_concepts": [
+      "host-to-host",
+      "process-to-process"
+    ]
   },
   {
     "id": "clean-architecture-dependency-rule",
     "question": "What is the dependency rule in Clean Architecture?",
-    "expected_source_document": "Coding/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf"
+    "expected_source_document": "Coding/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+    "expected_concepts": [
+      "dependencies",
+      "inward",
+      "inner circles",
+      "outer circles"
+    ]
   },
   {
     "id": "effective-java-static-factories",
     "question": "When are static factory methods preferable to constructors?",
-    "expected_source_document": "Java/Effective Java-Joshua Bloch.pdf"
+    "expected_source_document": "Java/Effective Java-Joshua Bloch.pdf",
+    "expected_concepts": [
+      "names",
+      "subtype",
+      "existing instances"
+    ]
   },
   {
     "id": "operating-systems-process-thread",
     "question": "What is the difference between a process and a thread?",
-    "expected_source_document": "Operating System/operating-system-concepts-9th-edition.pdf"
+    "expected_source_document": "Operating System/operating-system-concepts-9th-edition.pdf",
+    "expected_concepts": [
+      "address space",
+      "share",
+      "stack"
+    ]
   }
 ]
