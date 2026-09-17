@@ -2,6 +2,7 @@
 
 import argparse
 import os
+from typing import Literal
 
 from azure.core.credentials import AzureKeyCredential
 from azure.search.documents import SearchClient
@@ -14,6 +15,8 @@ SYSTEM_PROMPT = """You are a computer-science knowledge assistant.
 Answer only from the supplied source excerpts. If the excerpts do not contain
 enough information, say that you do not have enough information in the indexed
 sources. Cite claims using the bracketed source labels exactly as supplied."""
+
+RetrievalMode = Literal["vector", "hybrid"]
 
 
 def format_context(results: list[dict]) -> str:
@@ -28,10 +31,40 @@ def format_context(results: list[dict]) -> str:
     return "\n\n".join(excerpts)
 
 
-def ask_question(question: str, top: int = 5) -> tuple[str, list[dict]]:
+def ask_question(
+    question: str, top: int = 5, retrieval_mode: RetrievalMode = "vector"
+) -> tuple[str, list[dict]]:
     """Retrieve source chunks and generate a grounded answer for a question."""
+    sources = retrieve_sources(question, top, retrieval_mode)
+    context = format_context(sources)
+    load_dotenv()
+    openai_client = OpenAI(
+        api_key=os.environ["AZURE_OPENAI_API_KEY"],
+        base_url=os.environ["AZURE_OPENAI_ENDPOINT"].rstrip("/") + "/",
+    )
+    completion = openai_client.chat.completions.create(
+        model=os.environ["AZURE_OPENAI_CHAT_DEPLOYMENT"],
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {
+                "role": "user",
+                "content": f"Question: {question}\n\nSource excerpts:\n{context}",
+            },
+        ],
+        temperature=0,
+    )
+
+    return completion.choices[0].message.content or "", sources
+
+
+def retrieve_sources(
+    question: str, top: int = 5, retrieval_mode: RetrievalMode = "vector"
+) -> list[dict]:
+    """Retrieve the most relevant source chunks without generating an answer."""
     if top < 1:
         raise ValueError("top must be at least 1.")
+    if retrieval_mode not in {"vector", "hybrid"}:
+        raise ValueError("retrieval_mode must be 'vector' or 'hybrid'.")
 
     load_dotenv()
     openai_client = OpenAI(
@@ -54,7 +87,7 @@ def ask_question(question: str, top: int = 5) -> tuple[str, list[dict]]:
         fields="content_vector",
     )
     search_results = search_client.search(
-        search_text=None,
+        search_text=question if retrieval_mode == "hybrid" else None,
         vector_queries=[vector_query],
         select=["content", "source_document", "chunk_index"],
         top=top,
@@ -63,20 +96,7 @@ def ask_question(question: str, top: int = 5) -> tuple[str, list[dict]]:
     if not sources:
         raise RuntimeError("No matching source chunks were found in the index.")
 
-    context = format_context(sources)
-    completion = openai_client.chat.completions.create(
-        model=os.environ["AZURE_OPENAI_CHAT_DEPLOYMENT"],
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {
-                "role": "user",
-                "content": f"Question: {question}\n\nSource excerpts:\n{context}",
-            },
-        ],
-        temperature=0,
-    )
-
-    return completion.choices[0].message.content or "", sources
+    return sources
 
 
 def main() -> None:
@@ -90,10 +110,16 @@ def main() -> None:
         default=5,
         help="Number of source chunks to retrieve (default: 5).",
     )
+    parser.add_argument(
+        "--retrieval-mode",
+        choices=["vector", "hybrid"],
+        default="vector",
+        help="Retrieval strategy: vector only or hybrid keyword plus vector.",
+    )
     args = parser.parse_args()
 
     try:
-        answer, sources = ask_question(args.question, args.top)
+        answer, sources = ask_question(args.question, args.top, args.retrieval_mode)
     except ValueError as error:
         raise SystemExit(str(error)) from error
 

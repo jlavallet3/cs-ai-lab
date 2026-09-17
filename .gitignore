@@ -16,6 +16,8 @@ local.settings.json
 # Data and generated files
 data/
 evaluation/results.json
+evaluation/results-*.json
+evaluation/retrieval_comparison.json
 output/
 tmp/
 *.sqlite

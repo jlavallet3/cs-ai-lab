@@ -57,6 +57,12 @@ def main() -> None:
     parser.add_argument("--questions-file", type=Path, default=DEFAULT_QUESTIONS_FILE)
     parser.add_argument("--output-file", type=Path, default=DEFAULT_OUTPUT_FILE)
     parser.add_argument("--top", type=int, default=5)
+    parser.add_argument(
+        "--retrieval-mode",
+        choices=["vector", "hybrid"],
+        default="vector",
+        help="Retrieval strategy to evaluate (default: vector).",
+    )
     parser.add_argument("--limit", type=int, help="Evaluate only this many questions.")
     args = parser.parse_args()
 
@@ -75,7 +81,9 @@ def main() -> None:
     for position, question in enumerate(questions, start=1):
         print(f"Evaluating {position} of {len(questions)}: {question['id']}", flush=True)
         try:
-            answer, sources = ask_question(question["question"], args.top)
+            answer, sources = ask_question(
+                question["question"], args.top, args.retrieval_mode
+            )
             retrieved_sources = [source["source_document"] for source in sources]
             expected_source = normalize_path(question["expected_source_document"])
             expected_source_retrieved = expected_source in {
@@ -117,6 +125,8 @@ def main() -> None:
     )
     report = {
         "evaluated_at_utc": datetime.now(timezone.utc).isoformat(),
+        "retrieval_mode": args.retrieval_mode,
+        "top": args.top,
         "question_count": len(results),
         "successful_question_count": len(successful_results),
         "expected_source_retrieval_hits": expected_source_hits,
