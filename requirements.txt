@@ -4,3 +4,4 @@ fonttools
 azure-search-documents
 azure-identity
 openai
+streamlit
