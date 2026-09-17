@@ -18,6 +18,7 @@ data/
 evaluation/results.json
 evaluation/results-*.json
 evaluation/retrieval_comparison.json
+infrastructure/main.json
 output/
 tmp/
 *.sqlite
